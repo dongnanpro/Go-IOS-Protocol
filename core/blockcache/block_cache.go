@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"sync"
 
-	"encoding/json"
 	"strconv"
 
 	"github.com/iost-official/Go-IOS-Protocol/common"
@@ -13,7 +12,6 @@ import (
 	"github.com/iost-official/Go-IOS-Protocol/core/global"
 	"github.com/iost-official/Go-IOS-Protocol/db"
 	"github.com/iost-official/Go-IOS-Protocol/ilog"
-	"github.com/iost-official/Go-IOS-Protocol/vm/database"
 )
 
 type CacheStatus int
@@ -35,6 +33,10 @@ type WitnessList struct {
 	pendingWitnessList   []string
 	pendingWitnessNumber int64
 }
+
+var witList = []string{"IOSTjBxx7sUJvmxrMiyjEQnz9h5bfNrXwLinkoL9YvWjnrGdbKnBP", "IOSTgw6cmmWyiW25TMAK44N9coLCMaygx5eTfGVwjCcriEWEEjK2H", "IOSTxHn7wtQMpgvDbiypByZVNHrE6ELdXFbL1Vic8B23EgRNjQGbs",
+	"IOST2gxCPceKrWauFTqMCjMgZKRykp4Gt2Nd1H1XGRP1saYFXGqH4Y", "IOST24jsSGj2WxSRtgZkCDng19LPbT48HMsv2Nz13NXEYoqR1aYyvS", "IOST2v2ZumgyNXtpf1MEbkbbAK3tFfC856oMoVUYfYDvC1mpX14AvA",
+	"IOSTCJqjtLBntuWRGaZumevYgBEZsU8AaAdUpEMnpGieKV676B9St"}
 
 // SetPending set pending witness list
 func (wl *WitnessList) SetPending(pl []string) {
@@ -68,30 +70,32 @@ func (wl *WitnessList) PendingNum() int64 {
 
 // UpdatePending update pending witness list
 func (wl *WitnessList) UpdatePending(mv db.MVCCDB) error {
+	// todo del vote
+	//vi := database.NewVisitor(0, mv)
 
-	vi := database.NewVisitor(0, mv)
+	//spn := database.MustUnmarshal(vi.Get("iost.vote-" + "pendingBlockNumber"))
+	//if spn == nil {
+	//	return errors.New("failed to get pending number")
+	//}
+	//pn, err := strconv.ParseInt(spn.(string), 10, 64)
+	//if err != nil {
+	//	return err
+	//}
+	wl.SetPendingNum(0)
 
-	spn := database.MustUnmarshal(vi.Get("iost.vote-" + "pendingBlockNumber"))
-	if spn == nil {
-		return errors.New("failed to get pending number")
-	}
-	pn, err := strconv.ParseInt(spn.(string), 10, 64)
-	if err != nil {
-		return err
-	}
-	wl.SetPendingNum(pn)
+	//jwl := database.MustUnmarshal(vi.Get("iost.vote-" + "pendingProducerList"))
+	//if jwl == nil {
+	//	return errors.New("failed to get pending list")
+	//}
+	//
+	//str := make([]string, 0)
+	//err = json.Unmarshal([]byte(jwl.(string)), &str)
+	//if err != nil {
+	//	return err
+	//}
+	//wl.SetPending(str)
 
-	jwl := database.MustUnmarshal(vi.Get("iost.vote-" + "pendingProducerList"))
-	if jwl == nil {
-		return errors.New("failed to get pending list")
-	}
-
-	str := make([]string, 0)
-	err = json.Unmarshal([]byte(jwl.(string)), &str)
-	if err != nil {
-		return err
-	}
-	wl.SetPending(str)
+	wl.SetPending(witList)
 
 	return nil
 }
