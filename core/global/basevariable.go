@@ -9,12 +9,10 @@ import (
 	"github.com/iost-official/Go-IOS-Protocol/common"
 	"github.com/iost-official/Go-IOS-Protocol/consensus/verifier"
 	"github.com/iost-official/Go-IOS-Protocol/core/block"
-	"github.com/iost-official/Go-IOS-Protocol/core/contract"
 	"github.com/iost-official/Go-IOS-Protocol/core/tx"
 	"github.com/iost-official/Go-IOS-Protocol/crypto"
 	"github.com/iost-official/Go-IOS-Protocol/db"
 	"github.com/iost-official/Go-IOS-Protocol/vm"
-	"github.com/iost-official/Go-IOS-Protocol/vm/native"
 )
 
 // TMode type of mode
@@ -64,36 +62,36 @@ func GenGenesis(db db.MVCCDB, witnessInfo []string) (*block.Block, error) {
 		acts = append(acts, &act)
 	}
 	// deploy iost.vote
-	voteFilePath := VoteContractPath + "vote.js"
-	voteAbiPath := VoteContractPath + "vote.js.abi"
-	fd, err := common.ReadFile(voteFilePath)
-	if err != nil {
-		return nil, err
-	}
-	rawCode := string(fd)
-	fd, err = common.ReadFile(voteAbiPath)
-	if err != nil {
-		return nil, err
-	}
-	rawAbi := string(fd)
-	c := contract.Compiler{}
-	code, err := c.Parse("iost.vote", rawCode, rawAbi)
-	if err != nil {
-		return nil, err
-	}
-
-	act := tx.NewAction("iost.system", "InitSetCode", fmt.Sprintf(`["%v", "%v"]`, "iost.vote", code.B64Encode()))
-	acts = append(acts, &act)
-
-	num := len(witnessInfo) / 2
-	for i := 0; i < num; i++ {
-		act1 := tx.NewAction("iost.vote", "InitProducer", fmt.Sprintf(`["%v"]`, witnessInfo[2*i]))
-		acts = append(acts, &act1)
-	}
-
-	// deploy iost.bonus
-	act2 := tx.NewAction("iost.system", "InitSetCode", fmt.Sprintf(`["%v", "%v"]`, "iost.bonus", native.BonusABI().B64Encode()))
-	acts = append(acts, &act2)
+	//voteFilePath := VoteContractPath + "vote.js"
+	//voteAbiPath := VoteContractPath + "vote.js.abi"
+	//fd, err := common.ReadFile(voteFilePath)
+	//if err != nil {
+	//	return nil, err
+	//}
+	//rawCode := string(fd)
+	//fd, err = common.ReadFile(voteAbiPath)
+	//if err != nil {
+	//	return nil, err
+	//}
+	//rawAbi := string(fd)
+	//c := contract.Compiler{}
+	//code, err := c.Parse("iost.vote", rawCode, rawAbi)
+	//if err != nil {
+	//	return nil, err
+	//}
+	//
+	//act := tx.NewAction("iost.system", "InitSetCode", fmt.Sprintf(`["%v", "%v"]`, "iost.vote", code.B64Encode()))
+	//acts = append(acts, &act)
+	//
+	//num := len(witnessInfo) / 2
+	//for i := 0; i < num; i++ {
+	//	act1 := tx.NewAction("iost.vote", "InitProducer", fmt.Sprintf(`["%v"]`, witnessInfo[2*i]))
+	//	acts = append(acts, &act1)
+	//}
+	//
+	//// deploy iost.bonus
+	//act2 := tx.NewAction("iost.system", "InitSetCode", fmt.Sprintf(`["%v", "%v"]`, "iost.bonus", native.BonusABI().B64Encode()))
+	//acts = append(acts, &act2)
 
 	trx := tx.NewTx(acts, nil, 100000000, 0, 0)
 	trx.Time = 0

@@ -11,7 +11,7 @@ const (
 	// AddressLength ...
 	AddressLength = 20
 	// VoteInterval the interval between the votes
-	VoteInterval = 200
+	VoteInterval = 20000000000
 )
 
 // Hash is hash of data

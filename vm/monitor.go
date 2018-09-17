@@ -8,7 +8,6 @@ import (
 	"github.com/iost-official/Go-IOS-Protocol/ilog"
 	"github.com/iost-official/Go-IOS-Protocol/vm/host"
 	"github.com/iost-official/Go-IOS-Protocol/vm/native"
-	"github.com/iost-official/Go-IOS-Protocol/vm/v8vm"
 )
 
 var (
@@ -151,11 +150,11 @@ func Factory(lang string) VM {
 		vm := native.Impl{}
 		vm.Init()
 		return &vm
-	case "javascript":
-		vm := v8.NewVMPool(10, 200)
-		vm.Init()
-		//vm.SetJSPath(jsPath)
-		return vm
+		//case "javascript":
+		//	vm := v8.NewVMPool(10, 200)
+		//	vm.Init()
+		//	//vm.SetJSPath(jsPath)
+		//	return vm
 	}
 	return nil
 }

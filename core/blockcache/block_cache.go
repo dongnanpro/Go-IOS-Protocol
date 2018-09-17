@@ -34,6 +34,22 @@ const (
 	Virtual
 )
 
+//var accountList = []string{
+//	"IOSTjBxx7sUJvmxrMiyjEQnz9h5bfNrXwLinkoL9YvWjnrGdbKnBP",
+//	"IOSTgw6cmmWyiW25TMAK44N9coLCMaygx5eTfGVwjCcriEWEEjK2H",
+//	"IOSTxHn7wtQMpgvDbiypByZVNHrE6ELdXFbL1Vic8B23EgRNjQGbs",
+//	"IOST2gxCPceKrWauFTqMCjMgZKRykp4Gt2Nd1H1XGRP1saYFXGqH4Y",
+//	"IOST24jsSGj2WxSRtgZkCDng19LPbT48HMsv2Nz13NXEYoqR1aYyvS",
+//	"IOST2v2ZumgyNXtpf1MEbkbbAK3tFfC856oMoVUYfYDvC1mpX14AvA",
+//	"IOSTCJqjtLBntuWRGaZumevYgBEZsU8AaAdUpEMnpGieKV676B9St",
+//}
+
+var accountList = []string{
+	"IOSTjBxx7sUJvmxrMiyjEQnz9h5bfNrXwLinkoL9YvWjnrGdbKnBP",
+	"IOSTgw6cmmWyiW25TMAK44N9coLCMaygx5eTfGVwjCcriEWEEjK2H",
+	"IOSTxHn7wtQMpgvDbiypByZVNHrE6ELdXFbL1Vic8B23EgRNjQGbs",
+}
+
 // BlockCacheNode is the implementation of BlockCacheNode
 type BlockCacheNode struct {
 	Block        *block.Block
@@ -219,19 +235,22 @@ func (bc *BlockCacheImpl) setHead(h *BlockCacheNode) error {
 
 func (bc *BlockCacheImpl) updatePending(h *BlockCacheNode) error {
 
-	ok := bc.stateDB.Checkout(string(h.Block.HeadHash()))
-	if ok {
-		if err := h.UpdatePending(bc.stateDB); err != nil {
-			ilog.Error("failed to update pending, err:", err)
-			return err
-		}
-		if err := h.UpdateInfo(bc.stateDB); err != nil {
-			ilog.Error("failed to update witness info, err:", err)
-			return err
-		}
-	} else {
-		return errors.New("failed to state db")
-	}
+	//ok := bc.stateDB.Checkout(string(h.Block.HeadHash()))
+	//if ok {
+	//	if err := h.UpdatePending(bc.stateDB); err != nil {
+	//		ilog.Error("failed to update pending, err:", err)
+	//		return err
+	//	}
+	//	if err := h.UpdateInfo(bc.stateDB); err != nil {
+	//		ilog.Error("failed to update witness info, err:", err)
+	//		return err
+	//	}
+	//} else {
+	//	return errors.New("failed to state db")
+	//}
+	h.SetPending(accountList)
+	h.SetPendingNum(0)
+
 	return nil
 }
 
