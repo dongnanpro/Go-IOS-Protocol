@@ -24,8 +24,8 @@ var (
 	maxBlockHashQueryNumber int64 = 1000
 	retryTime                     = 5 * time.Second
 	syncBlockTimeout              = time.Second
-	syncHeightTime                = 3 * time.Second
-	heightTimeout           int64 = 5 * 3
+	syncHeightTime                = 9 * time.Second
+	heightTimeout           int64 = 5 * 9
 )
 
 type callbackfunc = func(hash string, peerID p2p.PeerID)
@@ -154,7 +154,7 @@ func (sy *SyncImpl) syncHeightLoop() {
 				continue
 			}
 			// ilog.Debugf("sync height from: %s, height: %v, time:%v", req.From().Pretty(), sh.Height, sh.Time)
-			sy.heightMap.Store(req.From(), sh)
+			sy.heightMap.Store(req.From(), &sh)
 		case <-sy.exitSignal:
 			return
 		}
@@ -172,7 +172,7 @@ func (sy *SyncImpl) CheckSync() bool {
 	heights = append(heights, sy.blockCache.Head().Number)
 	now := time.Now().Unix()
 	sy.heightMap.Range(func(k, v interface{}) bool {
-		sh, ok := v.(message.SyncHeight)
+		sh, ok := v.(*message.SyncHeight)
 		if !ok || sh.Time+heightTimeout < now {
 			sy.heightMap.Delete(k)
 			return true
