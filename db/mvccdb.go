@@ -6,6 +6,7 @@ import (
 
 	"github.com/iost-official/Go-IOS-Protocol/db/kv"
 	"github.com/iost-official/Go-IOS-Protocol/db/mvcc"
+	"github.com/iost-official/Go-IOS-Protocol/metrics"
 )
 
 //go:generate mockgen -destination mocks/mock_mvccdb.go -package db_mock github.com/iost-official/Go-IOS-Protocol/db MVCCDB
@@ -18,6 +19,12 @@ const (
 // error of mvccdb
 var (
 	ErrTableNotValid = fmt.Errorf("table name is not valid")
+	putCounter       = metrics.NewCounter("iost_mvcc_put", nil)
+	getCounter       = metrics.NewCounter("iost_mvcc_get", nil)
+	delCounter       = metrics.NewCounter("iost_mvcc_del", nil)
+	commitCounter    = metrics.NewCounter("iost_mvcc_commit", nil)
+	tagCounter       = metrics.NewCounter("iost_mvcc_tag", nil)
+	flushCounter     = metrics.NewCounter("iost_mvcc_flush", nil)
 )
 
 // MVCCDB is the interface of mvccdb
@@ -191,6 +198,7 @@ func (m *CacheMVCCDB) isValidTable(table string) bool {
 
 // Get returns the value of specify key and table
 func (m *CacheMVCCDB) Get(table string, key string) (string, error) {
+	getCounter.Add(1, nil)
 	if !m.isValidTable(table) {
 		return "", ErrTableNotValid
 	}
@@ -215,6 +223,7 @@ func (m *CacheMVCCDB) Get(table string, key string) (string, error) {
 
 // Put will insert the key-value pair into the table
 func (m *CacheMVCCDB) Put(table string, key string, value string) error {
+	putCounter.Add(1, nil)
 	if !m.isValidTable(table) {
 		return ErrTableNotValid
 	}
@@ -231,6 +240,7 @@ func (m *CacheMVCCDB) Put(table string, key string, value string) error {
 
 // Del will remove the specify key in the table
 func (m *CacheMVCCDB) Del(table string, key string) error {
+	delCounter.Add(1, nil)
 	if !m.isValidTable(table) {
 		return ErrTableNotValid
 	}
@@ -290,6 +300,7 @@ func (m *CacheMVCCDB) Keys(table string, prefix string) ([]string, error) {
 
 // Commit will commit current state of mvccdb
 func (m *CacheMVCCDB) Commit() {
+	commitCounter.Add(1, nil)
 	m.cm.Add(m.stage)
 	m.head = m.stage
 	m.stage = m.head.Fork()
@@ -313,6 +324,7 @@ func (m *CacheMVCCDB) Checkout(t string) bool {
 
 // Tag will add tag to current state of mvccdb
 func (m *CacheMVCCDB) Tag(t string) {
+	tagCounter.Add(1, nil)
 	m.cm.AddTag(m.head, t)
 }
 
@@ -337,6 +349,7 @@ func (m *CacheMVCCDB) Fork() MVCCDB {
 
 // Flush will persist the current state of mvccdb
 func (m *CacheMVCCDB) Flush(t string) error {
+	flushCounter.Add(1, nil)
 	commit := m.cm.Get(t)
 	if commit == nil {
 		return fmt.Errorf("not found tag: %v", t)
