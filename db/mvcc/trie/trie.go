@@ -9,6 +9,16 @@ const (
 	FreeListSize = uint64(0)
 )
 
+var pool = sync.Pool{
+	New: func() interface{} {
+		return &Node{
+			context:  nil,
+			value:    nil,
+			children: make(map[byte]*Node),
+		}
+	},
+}
+
 // Node is node of trie
 type Node struct {
 	context  *Context
@@ -116,11 +126,7 @@ func (f *FreeList) newNode() *Node {
 	//f.freelist = f.freelist[:i]
 
 	//return node
-	return &Node{
-		context:  nil,
-		value:    nil,
-		children: make(map[byte]*Node),
-	}
+	return pool.Get().(*Node)
 }
 
 func (f *FreeList) freeNode(n *Node) {
@@ -156,6 +162,7 @@ func (c *Context) freeNode(n *Node) {
 	n.value = nil
 	n.children = nil
 	c.freelist.freeNode(n)
+	pool.Put(n)
 }
 
 func (c *Context) fork() *Context {
