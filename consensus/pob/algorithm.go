@@ -32,7 +32,7 @@ var (
 )
 
 func generateBlock(account *account.Account, txPool txpool.TxPool, db db.MVCCDB) (*block.Block, error) {
-	f, err := os.Create(fmt.Sprintf("%d.mem", time.Now().Unix()))
+	f, err := os.Create(fmt.Sprintf("/var/lib/iserver/%d.mem", time.Now().Unix()))
 	if err != nil {
 		panic(err)
 	}
