@@ -48,7 +48,7 @@ func (m TMode) String() string {
 type BaseVariableImpl struct {
 	blockChain  block.Chain
 	stateDB     db.MVCCDB
-	txDB        tx.TxDB
+	txDB        TxDB
 	mode        TMode
 	witnessList []string
 	config      *common.Config
@@ -135,7 +135,7 @@ func GenGenesis(db db.MVCCDB, witnessInfo []string) (*block.Block, error) {
 func New(conf *common.Config) (*BaseVariableImpl, error) {
 	var blockChain block.Chain
 	var stateDB db.MVCCDB
-	var txDB tx.TxDB
+	var txDB TxDB
 	var err error
 	var witnessList []string
 	VoteContractPath = conf.Genesis.VoteContractPath
@@ -157,7 +157,7 @@ func New(conf *common.Config) (*BaseVariableImpl, error) {
 		if hash != "" {
 			return nil, fmt.Errorf("blockchaindb is empty, but statedb is not")
 		}
-		txDB, err = tx.NewTxDB(conf.DB.LdbPath + "TXDB")
+		txDB, err = NewTxDB(conf.DB.LdbPath + "TXDB")
 		if err != nil {
 			return nil, fmt.Errorf("new txDB failed, stop the program. err: %v", err)
 		}
@@ -209,7 +209,7 @@ func New(conf *common.Config) (*BaseVariableImpl, error) {
 			return nil, fmt.Errorf("flush stateDB failed, stop the pogram. err: %v", err)
 		}
 	}
-	txDB, err = tx.NewTxDB(conf.DB.LdbPath + "TXDB")
+	txDB, err = NewTxDB(conf.DB.LdbPath + "TXDB")
 	if err != nil {
 		return nil, fmt.Errorf("new txDB failed, stop the program. err: %v", err)
 	}
@@ -226,7 +226,7 @@ func FakeNew() (*BaseVariableImpl, error) {
 	if err != nil {
 		return nil, err
 	}
-	txDB, err := tx.NewTxDB("./Fakedb/TXDB")
+	txDB, err := NewTxDB("./Fakedb/TXDB")
 	if err != nil {
 		return nil, err
 	}
@@ -262,7 +262,7 @@ func FakeNew() (*BaseVariableImpl, error) {
 }
 
 // TxDB return the transaction database
-func (g *BaseVariableImpl) TxDB() tx.TxDB {
+func (g *BaseVariableImpl) TxDB() TxDB {
 	return g.txDB
 }
 
