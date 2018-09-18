@@ -122,7 +122,7 @@ L:
 
 	blk.Head.TxsHash = blk.CalculateTxsHash()
 	blk.Head.MerkleHash = blk.CalculateMerkleHash()
-	err := blk.CalculateHeadHash()
+	err = blk.CalculateHeadHash()
 	if err != nil {
 		return nil, err
 	}
