@@ -2,6 +2,8 @@ package pob
 
 import (
 	"errors"
+	"os"
+	"runtime/pprof"
 	"time"
 
 	"fmt"
@@ -30,6 +32,12 @@ var (
 )
 
 func generateBlock(account *account.Account, txPool txpool.TxPool, db db.MVCCDB) (*block.Block, error) {
+	f, err := os.Create(fmt.Sprintf("%d.mem", time.Now().Unix()))
+	if err != nil {
+		panic(err)
+	}
+	pprof.WriteHeapProfile(f)
+	defer f.Close()
 
 	ilog.Info("generate Block start")
 	limitTime := time.NewTimer(common.SlotLength / 3 * time.Second)
