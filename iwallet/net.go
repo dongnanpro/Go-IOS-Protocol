@@ -23,8 +23,6 @@ import (
 	"google.golang.org/grpc"
 )
 
-var netMethod string
-
 // balanceCmd represents the balance command
 var netCmd = &cobra.Command{
 	Use:   "net",
@@ -53,6 +51,7 @@ func init() {
 	// balanceCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
 
+// GetNetID is get id of the net
 func GetNetID() (string, error) {
 	conn, err := grpc.Dial(server, grpc.WithInsecure())
 	if err != nil {

@@ -141,6 +141,7 @@ func (b *blockTx) existTx(hash []byte) bool {
 	return r
 }
 
+// SortedTxMap is the implementation of SortedTxMap with sequence of transactions
 type SortedTxMap struct {
 	tree  *redblacktree.Tree
 	txMap map[string]*tx.Tx
@@ -156,6 +157,7 @@ func compareTx(a, b interface{}) int {
 	return int(txa.GasPrice - txb.GasPrice)
 }
 
+// NewSortedTxMap returns a SortedTxMap instance
 func NewSortedTxMap() *SortedTxMap {
 	return &SortedTxMap{
 		tree:  redblacktree.NewWith(compareTx),
@@ -164,12 +166,14 @@ func NewSortedTxMap() *SortedTxMap {
 	}
 }
 
+// Get is get a transaction
 func (st *SortedTxMap) Get(hash []byte) *tx.Tx {
 	st.rw.RLock()
 	defer st.rw.RUnlock()
 	return st.txMap[string(hash)]
 }
 
+// Add is add a transaction to SortedTxMap
 func (st *SortedTxMap) Add(tx *tx.Tx) {
 	st.rw.Lock()
 	st.tree.Put(tx, true)
@@ -177,6 +181,7 @@ func (st *SortedTxMap) Add(tx *tx.Tx) {
 	st.rw.Unlock()
 }
 
+// Del is delete a transaction
 func (st *SortedTxMap) Del(hash []byte) {
 	st.rw.Lock()
 	defer st.rw.Unlock()
@@ -189,6 +194,7 @@ func (st *SortedTxMap) Del(hash []byte) {
 	delete(st.txMap, string(hash))
 }
 
+// Size is size of SortedTxMap
 func (st *SortedTxMap) Size() int {
 	st.rw.Lock()
 	defer st.rw.Unlock()
@@ -196,6 +202,7 @@ func (st *SortedTxMap) Size() int {
 	return len(st.txMap)
 }
 
+// Iter is iterator
 func (st *SortedTxMap) Iter() *Iterator {
 	iter := st.tree.Iterator()
 	iter.End()

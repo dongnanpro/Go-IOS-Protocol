@@ -160,6 +160,7 @@ func (bc *BlockChain) Close() {
 	bc.blockChainDB.Close()
 }
 
+// Draw is printf the block chain
 func (bc *BlockChain) Draw(start int64, end int64) string {
 	ret := ""
 	for i := start; i <= end; i++ {

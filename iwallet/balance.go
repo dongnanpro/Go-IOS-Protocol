@@ -58,6 +58,7 @@ func init() {
 	// balanceCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
 
+// CheckBalance check balance of the account
 func CheckBalance(id string) (int64, error) {
 	conn, err := grpc.Dial(server, grpc.WithInsecure())
 	if err != nil {

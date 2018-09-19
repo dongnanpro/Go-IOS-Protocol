@@ -200,6 +200,7 @@ func (pool *TxPImpl) DelTx(hash []byte) error {
 	return nil
 }
 
+// DelTxList del the transaction in txPool
 func (pool *TxPImpl) DelTxList(delList []*tx.Tx) {
 	for _, t := range delList {
 		pool.pendingTx.Del(t.Hash())
