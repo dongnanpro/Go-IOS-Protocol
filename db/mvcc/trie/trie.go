@@ -2,6 +2,8 @@ package trie
 
 import (
 	"sync"
+
+	"github.com/iost-official/Go-IOS-Protocol/metrics"
 )
 
 // Constant of trie
@@ -9,15 +11,10 @@ const (
 	FreeListSize = uint64(0)
 )
 
-var pool = sync.Pool{
-	New: func() interface{} {
-		return &Node{
-			context:  nil,
-			value:    nil,
-			children: make(map[byte]*Node),
-		}
-	},
-}
+var (
+	newNodeCounter = metrics.NewCounter("iost_trie_new", nil)
+	forkCounter    = metrics.NewCounter("iost_trie_fork", nil)
+)
 
 // Node is node of trie
 type Node struct {
@@ -73,6 +70,7 @@ func (n *Node) put(key []byte, value interface{}, i int) *Node {
 }
 
 func (n *Node) forkWithContext(context *Context) *Node {
+	forkCounter.Add(1, nil)
 	node := context.newNode()
 	node.value = n.value
 	for k, v := range n.children {
@@ -110,6 +108,7 @@ func NewFreeList() *FreeList {
 }
 
 func (f *FreeList) newNode() *Node {
+	newNodeCounter.Add(1, nil)
 	//f.mu.Lock()
 	//defer f.mu.Unlock()
 
@@ -126,7 +125,11 @@ func (f *FreeList) newNode() *Node {
 	//f.freelist = f.freelist[:i]
 
 	//return node
-	return pool.Get().(*Node)
+	return &Node{
+		context:  nil,
+		value:    nil,
+		children: make(map[byte]*Node),
+	}
 }
 
 func (f *FreeList) freeNode(n *Node) {
@@ -162,7 +165,6 @@ func (c *Context) freeNode(n *Node) {
 	n.value = nil
 	n.children = make(map[byte]*Node)
 	c.freelist.freeNode(n)
-	pool.Put(n)
 }
 
 func (c *Context) fork() *Context {
